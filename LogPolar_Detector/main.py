@@ -10,7 +10,7 @@ from math import copysign,log10
 from skimage.transform import warp_polar, rotate, rescale
 from skimage.util import img_as_float
 
-blockSize = 8
+blockSize = 64
 logRadius = blockSize/2
 
 imgName = input("Entrer le chemin de l'image : ")
@@ -34,7 +34,7 @@ for i in range (0, h - blockSize, blockSize):
         array = img[i:i+blockSize, j:j+blockSize]
         blocks.append(array)
 
-cv2.imshow("block i", blocks[5 + 50*blockPerLine])
+cv2.imshow("block i", blocks[5 + 5*blockPerLine])
 #if cv2.waitKey(0) & 0xff == 27:
 #    cv2.destroyAllWindows()
 
@@ -43,11 +43,10 @@ blocksLog = []
 for x in blocks:
     imgFl = x.astype(np.float32)
     value = np.sqrt(((imgFl.shape[0]/2.0)**2.0 + (imgFl.shape[1]/2.0)**2.0))
-    polar_image = cv2.linearPolar(imgFl, (imgFl.shape[0]/2, imgFl.shape[1]/2), value, cv2.WARP_FILL_OUTLIERS)
+    polar_image = cv2.linearPolar(imgFl, (imgFl.shape[0]/2, imgFl.shape[1]/2), blockSize/2, cv2.WARP_FILL_OUTLIERS)
     polar_image = polar_image.astype(np.uint8)
-    #imgLog =warp_polar(imgFl, radius=logRadius, multichannel=True, scaling='log')
     blocksLog.append(polar_image)
 
-cv2.imshow("block log", blocksLog[5 + 50*blockPerLine])
+cv2.imshow("block log", blocksLog[5 + 5*blockPerLine])
 if cv2.waitKey(0) & 0xff == 27:
     cv2.destroyAllWindows()
