@@ -51,3 +51,4 @@ for x in blocks:
 cv2.imshow("block log", blocksLog[5 + 50*blockPerLine])
 if cv2.waitKey(0) & 0xff == 27:
     cv2.destroyAllWindows()
+
