@@ -2,9 +2,10 @@
 # Base imports
 import cv2.cv2
 import matplotlib.pyplot as plt
-import numpy
 import numpy as np
 from math import copysign,log10
+import scipy
+import statistics
 
 # Log-Polar operations
 from skimage.transform import warp_polar, rotate, rescale
@@ -51,3 +52,31 @@ cv2.imshow("block log", blocksLog[5 + 5*blockPerLine])
 if cv2.waitKey(0) & 0xff == 27:
     cv2.destroyAllWindows()
 
+
+blocksFFT = []
+
+for x in blocks:
+    f = np.fft.fft2(x)
+    blocksFFT.append(f)
+
+listEquals = []
+
+for i in range(0, len(blocksFFT)):
+    for j in range(i+1, len(blocksFFT)):
+        #sComplex = np.conj(blocksFFT[j])
+        cross = scipy.signal.csd(blocksFFT[i], blocksFFT[j], scaling='spectrum')
+        for x in cross:
+            if x != 0:
+                x = x / abs(x)
+
+        crossNp = np.array(cross)
+        #invG = np.fft.ifft2(crossNp)
+        #print("Type de cross : {}".format(type(cross)))
+        #fg = np.fft.fft2(crossNp)
+
+        #if max(cross)>statistics.mean(fg):
+        #    listEquals.append((i,j))
+
+cv2.imshow("test", cross)
+if cv2.waitKey(0) & 0xff == 27:
+    cv2.destroyAllWindows()

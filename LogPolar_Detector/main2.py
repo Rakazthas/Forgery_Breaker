@@ -50,6 +50,7 @@ plt.subplot(121),plt.imshow(image_polar, cmap = 'gray')
 plt.title('Input Image'), plt.xticks([]), plt.yticks([])
 plt.subplot(122),plt.imshow(magnitude_spectrum, cmap = 'gray')
 plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+
 f=np.fft.fft2(rotated_polar)
 fshift = np.fft.fftshift(f)
 magnitude_spectrum_polar = 20*np.log(np.abs(fshift))
