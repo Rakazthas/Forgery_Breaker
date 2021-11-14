@@ -61,9 +61,13 @@ for x in blocks:
 
 listEquals = []
 
+#TODO : faire fonctionner calcul normalized cross power
+'''
 for i in range(0, len(blocksFFT)):
     for j in range(i+1, len(blocksFFT)):
-        #sComplex = np.conj(blocksFFT[j])
+        sComplex = np.conj(blocksFFT[j])
+        cross = blocksFFT[i]*sComplex
+        crossAbs = cross/abs(cross)
         cross = scipy.signal.csd(blocksFFT[i], blocksFFT[j], scaling='spectrum')
         for x in cross:
             if x != 0:
@@ -72,11 +76,12 @@ for i in range(0, len(blocksFFT)):
         crossNp = np.array(cross)
         #invG = np.fft.ifft2(crossNp)
         #print("Type de cross : {}".format(type(cross)))
-        #fg = np.fft.fft2(crossNp)
 
-        #if max(cross)>statistics.mean(fg):
-        #    listEquals.append((i,j))
+        if max(cross)>statistics.mean(fg):
+            listEquals.append((i,j))
 
-cv2.imshow("test", cross)
-if cv2.waitKey(0) & 0xff == 27:
-    cv2.destroyAllWindows()
+
+#cv2.imshow("test", cross)
+#if cv2.waitKey(0) & 0xff == 27:
+#    cv2.destroyAllWindows()
+'''
