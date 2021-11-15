@@ -27,15 +27,18 @@ cv2.imshow('img', img)
 #if cv2.waitKey(0) & 0xff == 27:
 #    cv2.destroyAllWindows()
 
+imgYCC = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
+imgY = cv2.cv2.split(imgYCC)[0]
+
 blockPerLine = int(w/blockSize)
 blocks = []
 
 for i in range (0, h - blockSize, blockSize):
     for j in range (0, w - blockSize, blockSize):
-        array = img[i:i+blockSize, j:j+blockSize]
+        array = imgY[i:i+blockSize, j:j+blockSize]
         blocks.append(array)
 
-cv2.imshow("block i", blocks[5 + 5*blockPerLine])
+#cv2.imshow("block i", blocks[5 + 5*blockPerLine])
 #if cv2.waitKey(0) & 0xff == 27:
 #    cv2.destroyAllWindows()
 
@@ -48,40 +51,73 @@ for x in blocks:
     polar_image = polar_image.astype(np.uint8)
     blocksLog.append(polar_image)
 
-cv2.imshow("block log", blocksLog[5 + 5*blockPerLine])
+#cv2.imshow("block log", blocksLog[5 + 5*blockPerLine])
 if cv2.waitKey(0) & 0xff == 27:
     cv2.destroyAllWindows()
 
 
 blocksFFT = []
 
-for x in blocks:
+for x in blocksLog:
     f = np.fft.fft2(x)
     blocksFFT.append(f)
 
 listEquals = []
 
-#TODO : faire fonctionner calcul normalized cross power
+listMax = {}
+listMean = {}
+for i in range(0, len(blocksLog)):
+    for j in range(i+1, len(blocksLog)):
+        f, cross = scipy.signal.csd(blocksLog[i], blocksLog[j], scaling = 'spectrum')
+
+        _norm = np.linalg.norm(cross)
+        nCross = cross/_norm
+
+        _max = []
+        _mean = []
+
+        invG = np.fft.ifft2(nCross)
+
+        absInvG = []
+
+        for x in invG:
+            absI = []
+            for y in x:
+                absI.append(abs(y))
+            absInvG.append(absI)
+
+        for x in absInvG:
+            _max.append(max(x))
+            _mean.append(statistics.mean(x))
+        finMax = max(_max)
+        finMean = statistics.mean(_mean)
+
+        listMax[i, j] = finMax
+        listMean[i, j] = finMean
+
+        '''if finMax > 0.35:
+            listEquals.append([i, j])'''
+
+_mean = 0
+L = len(blocksLog)*(len(blocksLog)-1)/2
+for i in range(0, len(blocksLog)):
+    for j in range(i+1, len(blocksLog)):
+        _mean += listMean[i, j]
+
+_mean = _mean/L
 '''
-for i in range(0, len(blocksFFT)):
-    for j in range(i+1, len(blocksFFT)):
-        sComplex = np.conj(blocksFFT[j])
-        cross = blocksFFT[i]*sComplex
-        crossAbs = cross/abs(cross)
-        cross = scipy.signal.csd(blocksFFT[i], blocksFFT[j], scaling='spectrum')
-        for x in cross:
-            if x != 0:
-                x = x / abs(x)
+for i in range(0, len(blocksLog)):
+    for j in range(i+1, len(blocksLog)):
+        if listMax[i, j] > _mean:
+            listEquals.append([i, j])'''
 
-        crossNp = np.array(cross)
-        #invG = np.fft.ifft2(crossNp)
-        #print("Type de cross : {}".format(type(cross)))
+for i in range(0, len(blocksLog)):
+    for j in range(i+1, len(blocksLog)):
+        print("Max du bloc [{}, {}] : {}".format(i, j, listMax[i, j]))
 
-        if max(cross)>statistics.mean(fg):
-            listEquals.append((i,j))
+print("Moyenne : {}".format(_mean))
+#TODO : correlation test error
 
 
-#cv2.imshow("test", cross)
-#if cv2.waitKey(0) & 0xff == 27:
-#    cv2.destroyAllWindows()
-'''
+print("Liste de couples : {}".format(listEquals))
+
