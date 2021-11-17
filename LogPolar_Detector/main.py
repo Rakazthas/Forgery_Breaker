@@ -2,6 +2,7 @@
 # Base imports
 import cv2.cv2
 import matplotlib.pyplot as plt
+import numpy
 import numpy as np
 from math import copysign,log10
 import scipy
@@ -62,8 +63,75 @@ for x in blocksLog:
     f = np.fft.fft2(x)
     blocksFFT.append(f)
 
+'''
+print("Type de f : {}".format(type(f)))
+print("Type de f[0] : {}".format(type(f[0])))
+print("Val de f[0] : {}".format(f[0]))
+'''
+nbBlocks = len(blocksLog)
+L = int(nbBlocks*(nbBlocks-1)/2)
 listEquals = []
+listMax = {}
+listMean = {}
 
+for i in range(0, nbBlocks):
+    for j in range(i+1, nbBlocks):
+        G_a = np.fft.fft2(blocksLog[i])
+        G_b = np.fft.fft2(blocksLog[j])
+
+        conj_b = np.ma.conjugate(G_b)
+
+        R = G_a*conj_b
+        R /= np.absolute(R)
+        r = np.fft.ifft2(R)
+        nr = np.absolute(r)
+
+        _max = np.amax(nr)
+        _mean = np.mean(nr)
+
+        listMax[i, j] = _max
+        listMean[i, j] = _mean
+
+        print("Max du bloc [{}, {}] : {}".format(i, j, _max))
+
+'''
+for i in range(0, len(blocksFFT)):
+    for j in range(i+1, len(blocksFFT)):
+
+        g = numpy.empty(shape=len(blocksFFT[i]))
+        for x in range (0, len(blocksFFT[i])):
+            h = numpy.empty(shape=len(blocksFFT[i][x]))
+            for y in range (0, len(blocksFFT[i][x])):
+                val = blocksFFT[i][x][y] * blocksFFT[j][x][y].conjugate()
+                if val != 0:
+                    val = val/abs(val)
+                np.append(h, val)
+            np.append(g, h)
+
+        _max = []
+        _mean = []
+
+        invG = np.fft.ifft2(g)
+
+        absInvG = []
+
+        for x in invG:
+            absI = []
+            for y in x:
+                absI.append(abs(y))
+            absInvG.append(absI)
+
+        for x in absInvG:
+            _max.append(max(x))
+            _mean.append(statistics.mean(x))
+        finMax = max(_max)
+        finMean = statistics.mean(_mean)
+
+        listMax[i, j] = finMax
+        listMean[i, j] = finMean
+'''
+
+'''
 listMax = {}
 listMean = {}
 for i in range(0, len(blocksLog)):
@@ -95,28 +163,40 @@ for i in range(0, len(blocksLog)):
         listMax[i, j] = finMax
         listMean[i, j] = finMean
 
-        '''if finMax > 0.35:
-            listEquals.append([i, j])'''
+        if finMax > 0.35:
+            listEquals.append([i, j])
+'''
 
-_mean = 0
-L = len(blocksLog)*(len(blocksLog)-1)/2
-for i in range(0, len(blocksLog)):
-    for j in range(i+1, len(blocksLog)):
-        _mean += listMean[i, j]
+globMeanList = list(listMean.values())
+globMean = np.mean(globMeanList)
 
-_mean = _mean/L
+#globMean = 0
+
+'''
+for i in range(0, nbBlocks):
+    for j in range(i+1, nbBlocks):
+        globMean += listMean[i, j]
+
+_mean = globMean/L
+'''
+
+
+#globMean = np.mean(listMean)
 '''
 for i in range(0, len(blocksLog)):
     for j in range(i+1, len(blocksLog)):
-        if listMax[i, j] > _mean:
-            listEquals.append([i, j])'''
+        if listMax[i, j] > 0.35: #globMean:
+            listEquals.append([i, j])
+'''
 
-for i in range(0, len(blocksLog)):
-    for j in range(i+1, len(blocksLog)):
-        print("Max du bloc [{}, {}] : {}".format(i, j, listMax[i, j]))
+for key, value in listMean.items():
+    print("key : {}, value : {}".format(key, value))
+    if value > 0.35:
+        listEquals.append(key)
 
-print("Moyenne : {}".format(_mean))
-#TODO : correlation test error
+#print("Moyennes : {}".format(listMean))
+print("Moyenne : {}".format(globMean))
+#TODO : check why diff max/listMax.value
 
 
 print("Liste de couples : {}".format(listEquals))
