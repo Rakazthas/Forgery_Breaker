@@ -1,6 +1,6 @@
 # Log-Polar detection script
 # Base imports
-import cv2.cv2
+import cv2.cv2 as cv2
 import matplotlib.pyplot as plt
 import numpy
 import numpy as np
@@ -29,7 +29,7 @@ cv2.imshow('img', img)
 #    cv2.destroyAllWindows()
 
 imgYCC = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
-imgY = cv2.cv2.split(imgYCC)[0]
+imgY = cv2.split(imgYCC)[0]
 
 blockPerLine = int(w/blockSize)
 blocks = []
@@ -88,31 +88,33 @@ for i in range(0, nbBlocks):
 
         R = G_a*conj_b
         R /= np.absolute(R)
-        r = np.fft.ifft2(R).real
-        #nr = np.absolute(r)
+        r = np.fft.ifft2(R)#.real
+        #r = r/np.linalg.norm(r)
+        nr = np.absolute(r)
+        #nr = nr/np.linalg.norm(nr)
 
         #_max = np.amax(nr)
         #_mean = np.mean(nr)
 
-        listMax[i, j] = np.amax(r) #_max
-        listMean[i, j] = np.mean(r) #_mean
+        listMax[i, j] = np.amax(nr) #_max
+        listMean[i, j] = np.mean(nr) #_mean
 
         print("Mean/max du bloc [{}, {}] : {}/{}".format(i, j, listMean[i, j], listMax[i, j]))
         #print("progression : {}/{}".format(adv, L))
         #adv += 1
 
-globMeanList = list(listMean.values())
-globMean = np.mean(globMeanList)
+#globMeanList = list(listMean.values())
+#globMean = np.mean(globMeanList)
 
-#globMean = 0
+globMean = 0
 
-'''
+
 for i in range(0, nbBlocks):
     for j in range(i+1, nbBlocks):
         globMean += listMean[i, j]
 
 _mean = globMean/L
-'''
+
 
 
 '''
@@ -129,7 +131,7 @@ test seuil
 '''
 for key, value in listMean.items():
     print("key : {}, value : {}".format(key, value))
-    if value < 0.35:
+    if value < 0.03:
         listEquals.append(key)
 
 
