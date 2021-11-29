@@ -1,0 +1,33 @@
+test 1
+
+=================================================================
+Total params: 15,709,849
+Trainable params: 995,161
+Non-trainable params: 14,714,688
+_________________________________________________________________
+Epoch 1/6
+181/181 [==============================] - 1191s 7s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 2/6
+181/181 [==============================] - 1254s 7s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 3/6
+181/181 [==============================] - 1238s 7s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 4/6
+181/181 [==============================] - 1230s 7s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 5/6
+181/181 [==============================] - 1222s 7s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 6/6
+181/181 [==============================] - 1264s 7s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135
+
+Process finished with exit code 0
+
+
+
+test 2
+Epoch 1/4
+193/193 [==============================] - 1160s 6s/step - loss: 0.7940 - accuracy: 0.7061 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 2/4
+193/193 [==============================] - 1171s 6s/step - loss: 0.7899 - accuracy: 0.7101 - val_loss: 0.7890 - val_accuracy: 0.7107
+Epoch 3/4
+193/193 [==============================] - 1178s 6s/step - loss: 0.7916 - accuracy: 0.7084 - val_loss: 0.7865 - val_accuracy: 0.7135
+Epoch 4/4
+193/193 [==============================] - 1181s 6s/step - loss: 0.7918 - accuracy: 0.7082 - val_loss: 0.7865 - val_accuracy: 0.7135

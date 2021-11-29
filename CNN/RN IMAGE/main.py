@@ -14,6 +14,9 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 np.random.seed(2)
+import pywt
+
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from keras.utils.np_utils import to_categorical
@@ -41,7 +44,8 @@ for dirname, _, filenames in os.walk(path):
     for filename in filenames:
         if filename.endswith('jpg') or filename.endswith('tif'):
             full_path = os.path.join(dirname, filename)
-            X.append(Image.open(full_path).convert('RGB'))
+            im=np.asarray(Image.open(full_path).convert('RGB').resize((227,227)))
+            X.append(im)
             Y.append(1)
             if len(Y) % 500 == 0:
                 print(f'Processing {len(Y)} images')
@@ -56,7 +60,8 @@ for dirname, _, filenames in os.walk(path):
     for filename in filenames:
         if filename.endswith('jpg') or filename.endswith('tif'):
             full_path = os.path.join(dirname, filename)
-            X.append(Image.open(full_path).convert('RGB'))
+            im = np.asarray(Image.open(full_path).convert('RGB').resize((227,227)))
+            X.append(im)
             Y.append(0)
             if len(Y) % 500 == 0:
                 print(f'Processing {len(Y)} images')
@@ -65,68 +70,23 @@ print(len(X), len(Y))
 
 X = np.array(X)
 Y = to_categorical(Y, 2)
-
-for i in range(0,X.size):
-    X[i].resize((227,227))
-    X[i] = numpy.asarray(X[i])
+print(f'still not bugging for now')
 
 
+
+
+
+print(X)
+
+# X = pywt.dwt2(X,'haar') Mon pc meurt, faut pas faire ça
 X_train, X_val, Y_train, Y_val = train_test_split(X, Y, test_size = 0.2, random_state=5)
-X = X.reshape(-1,1,1,1)
+#X = X.reshape(-1,1,1,1)
 print(len(X_train), len(Y_train))
 print(len(X_val), len(Y_val))
 
 #fin de l'inspiration
 
 
-
-
-'''
-
-(ds_train,ds_test),ds_info = tds.load('mnist',split=['train','test'],shuffle_files=True,as_supervised=True,with_info=True)
-
-def normalize_img(image,label):
-    return tf.cast(image,tf.float32)/255., label
-
-
-ds_train = ds_train.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
-ds_train=ds_train.cache()
-ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
-ds_train = ds_train.batch(128)
-ds_train=ds_train.prefetch(tf.data.AUTOTUNE)
-
-ds_test = ds_test.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
-ds_test = ds_test.batch(128)
-ds_test = ds_test.cache()
-ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
-
-
-'''
-
-
-
-
-'''
-(x_train, y_train),(x_test, y_test) =mnist
-
-x_train = tk.utils.normalize(x_train,axis=1)
-x_test = tk.utils.normalize(x_test, axis=1)
-
-'''
-
-'''
-# Load MNIST
-(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
-
-# Preprocess the data by flattening & scaling it
-x_train = x_train.reshape(-1, 127).astype("float32") / 255
-x_test = x_test.reshape(-1, 127).astype("float32") / 255
-
-# Categorical (one hot) encoding of the labels
-y_train = tk.utils.to_categorical(y_train)
-y_test = tk.utils.to_categorical(y_test)
-
-'''
 
 
 
@@ -162,14 +122,70 @@ CNN.summary()
 #on compile CNN
 
 
-CNN.compile(optimizer='adam',loss='keras.losses.hinge',metrics='accuracy')
-
-
-#on entraine le model.
-#model_info = CNN.fit(train_generator,steps_per_epoch=8,epochs=15,verbose=1,validation_data=validation_generator,validation_steps=8)
-#CNN.fit(x_train,y_train,epochs=3)
-#CNN.fit(ds_train, epochs=6, validation_data=ds_test)
-CNN.fit(X_train,Y_train, epochs=6, validation_data=(X_val, Y_val))
+CNN.compile(optimizer='adam', loss=keras.losses.hinge, metrics='accuracy')
 
 
 
+tf.convert_to_tensor(X_val.astype(np.float32), dtype=tf.float32)
+tf.convert_to_tensor(Y_val.astype(np.float32), dtype=tf.float32)
+
+history = CNN.fit(X_train,Y_train, batch_size=32, epochs=100, validation_data=(X_val, Y_val))
+
+CNN.save_weights('CNN2.h5')
+#model.load_weights('CNN.h5')
+
+
+# Plot the loss and accuracy curves for training and validation  // CODE VOLE SUBTILEMENT
+fig, ax = plt.subplots(2,1)
+ax[0].plot(history.history['loss'], color='b', label="Training loss")
+ax[0].plot(history.history['val_loss'], color='r', label="validation loss",axes =ax[0])
+legend = ax[0].legend(loc='best', shadow=True)
+
+ax[1].plot(history.history['accuracy'], color='b', label="Training accuracy")
+ax[1].plot(history.history['val_accuracy'], color='r',label="Validation accuracy")
+legend = ax[1].legend(loc='best', shadow=True)
+
+'''
+def plot_confusion_matrix(cm, classes,   #code volé subtilement aussi
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+'''
+
+# Predict the values from the validation dataset
+Y_pred = model.predict(X_val)
+# Convert predictions classes to one hot vectors
+Y_pred_classes = np.argmax(Y_pred, axis=1)
+# Convert validation observations to one hot vectors
+Y_true = np.argmax(Y_val, axis=1)
+# compute the confusion matrix
+#confusion_mtx = confusion_matrix(Y_true, Y_pred_classes)
+# plot the confusion matrix
+#plot_confusion_matrix(confusion_mtx, classes=range(2))
+
+
+#voir le guide https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/   pour sauvegarder le RN
