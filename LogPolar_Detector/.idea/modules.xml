@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/LogPolar_Detector.iml" filepath="$PROJECT_DIR$/.idea/LogPolar_Detector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../copy-move_detector/.idea/copy-move_detector.iml" filepath="$PROJECT_DIR$/../copy-move_detector/.idea/copy-move_detector.iml" />
     </modules>
   </component>
 </project>
