@@ -129,7 +129,7 @@ CNN.compile(optimizer='adam', loss=keras.losses.hinge, metrics='accuracy')
 tf.convert_to_tensor(X_val.astype(np.float32), dtype=tf.float32)
 tf.convert_to_tensor(Y_val.astype(np.float32), dtype=tf.float32)
 
-history = CNN.fit(X_train,Y_train, batch_size=32, epochs=100, validation_data=(X_val, Y_val))
+history = CNN.fit(X_train,Y_train, batch_size=32, epochs=5, validation_data=(X_val, Y_val))
 
 CNN.save_weights('CNN2.h5')
 #model.load_weights('CNN.h5')
