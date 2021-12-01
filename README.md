@@ -12,7 +12,7 @@ Scripts to detect forgery in an image, using SIFT and clustering approach for co
 ---
 #Usage
 ##Copy-move
-Run GUI.py in GUI folder, choose an image, and adjust eps and minSamples to your image, then press "run test".
+Run GUISift.py in GUI folder, choose an image, and adjust eps and minSamples to your image, then press "run test".
 
     -eps : max distance for neighbour research (from 1 to 500)
     -minsamples : minimum number of neighbours required for a cluster (from 2 to 50)
