@@ -4,9 +4,6 @@ import numpy as np
 from sklearn.cluster import DBSCAN
 
 class SIFT(object):
-    def __init__(self, filepath):
-        self.img = cv2.imread(filepath)
-
     def __init__(self, img):
         self.img = img
 

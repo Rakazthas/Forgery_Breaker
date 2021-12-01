@@ -5,14 +5,12 @@ import cv2.cv2 as cv2
 
 from siftDetector import SIFT
 
-'''
-import les scripts de test
-'''
+
 global img
 
 
 def openImg():
-    res = askopenfilename(title="Ouvrir une image", filetypes=[('all files', '.*')])
+    res = askopenfilename(title="Open file", filetypes=[('all files', '.*')])
     filePath.delete(0, END)
     filePath.insert(0, res)
 
@@ -20,9 +18,9 @@ def openImg():
 def testForgery():
     img = cv2.imread(filename=path.get())
     if img is None:
-        showerror("Erreur", "Veuillez entrer un chemin d'image valide")
+        showerror("Error", "Please use a valid image")
     else:
-        cv2.imshow("Image à tester", img)
+        cv2.imshow("Original image", img)
         print("Test en cours")
 
         if epsVar.get() > 500:
@@ -43,9 +41,9 @@ def testForgery():
 
         forgery = detect.forgeryLocate(eps=float(epsVar.get()), minSamples=float(minSamplesVar.get()))
         if forgery is None:
-            showinfo("Résultat", "Aucune falsification copy-move détectée")
+            showinfo("Result", "No copy-move forgery found")
         else:
-            cv2.imshow("Falsification trouvée", forgery)
+            cv2.imshow("Forgery found", forgery)
 
 
 window = Tk()
@@ -53,10 +51,10 @@ window = Tk()
 imageWindow = PanedWindow(window, orient=HORIZONTAL)
 
 path = StringVar()
-path.set("Chemin de l'image")
+path.set("Image path")
 filePath = Entry(imageWindow, textvariable=path)
 
-imgButton = Button(imageWindow, text="Choisir une image", command=openImg)
+imgButton = Button(imageWindow, text="Choose image", command=openImg)
 
 imageWindow.add(filePath)
 imageWindow.add(imgButton)
@@ -65,18 +63,18 @@ imageWindow.pack()
 
 optionsWindow = PanedWindow(window, orient=HORIZONTAL)
 
-epsVar = DoubleVar(40)
-minSamplesVar = DoubleVar(2)
+epsVar = DoubleVar(value=40)
+minSamplesVar = DoubleVar(value=2)
 
-eps = Spinbox(optionsWindow, from_=1, to=500, textVariable=epsVar)
-minSamples = Spinbox(optionsWindow, from_=2, to=50, textVariable=minSamplesVar)
+eps = Spinbox(optionsWindow, from_=1, to=500, textvariable=epsVar)
+minSamples = Spinbox(optionsWindow, from_=2, to=50, textvariable=minSamplesVar)
 
 optionsWindow.add(eps)
 optionsWindow.add(minSamples)
 
 optionsWindow.pack()
 
-launchButton = Button(window, text="Lancer le test", command=testForgery)
+launchButton = Button(window, text="Run test", command=testForgery)
 launchButton.pack(side=BOTTOM)
 
 window.mainloop()
